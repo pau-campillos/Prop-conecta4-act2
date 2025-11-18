@@ -30,44 +30,63 @@ public class Propossat
     int millorMoviment = -1;
     int valor = Integer.MIN_VALUE;
     for (int columna = 0; t.espotmoure() && columna < t.getMida(); columna++) {
+      
         if (!t.movpossible(columna)) continue;
 
         Tauler s = new Tauler(t);
         s.afegeix(columna, color);
 
-        int candidat = Min_Valor(t, color, columna, depth-1);
-        if(valor < candidat){
+        int candidat = Min_Valor(s, -color, columna, depth-1);
+        if(candidat > valor){ //Deberia de tener un =
             valor = candidat;
             millorMoviment = columna;
         }
-    }
-    if (millorMoviment == -1) {
-        throw new RuntimeException("No es pot triar moviment");
+        
     }
     
+    if (millorMoviment == -1) {
+      for(int columna = 0; columna < t.getMida(); ++columna){
+        if (t.movpossible(columna)){
+          millorMoviment = columna;
+          break;
+        }
+      }
+    }
     return millorMoviment;
   }
   
   private int Min_Valor(Tauler t, int color, int col, int depth){
-    if (t.solucio(color, col)) return Integer.MAX_VALUE;
+    if (t.solucio(col, -color)) return Integer.MAX_VALUE; // Guany l' adversari.
     else if (!t.espotmoure()) return 0;
+    
     int valor = Integer.MAX_VALUE;
     if(depth > 0){
       for (int columna = 0; t.espotmoure() && columna < t.getMida(); columna++) {
-      valor = Math.min(valor, Max_Valor(t,color,columna,depth-1));
+        if (!t.movpossible(columna)) continue;
+        
+        Tauler s = new Tauler(t);
+        s.afegeix(columna, color);
+      
+        valor = Math.min(valor, Max_Valor(s,-color,columna,depth-1));
       }
     }
     return valor;
   }
 
+
   private int Max_Valor(Tauler t, int color, int col, int depth){
-    if (t.solucio(color, col)) return Integer.MAX_VALUE;
+    if (t.solucio(col, -color)) return Integer.MIN_VALUE; // Hem guanyat
     else if (!t.espotmoure()) return 0;
+    
     int valor = Integer.MIN_VALUE;
+    
     if (depth > 0) {
-        for (int columna = 0; t.espotmoure() && columna < t.getMida(); columna++) {
-        valor = Math.max(valor, Min_Valor(t,color,columna,depth-1));
-        }
+      for (int columna = 0; t.espotmoure() && columna < t.getMida(); columna++) {
+        if (!t.movpossible(columna)) continue;
+        Tauler s = new Tauler(t);
+        s.afegeix(columna, color);
+        valor = Math.max(valor, Min_Valor(s,-color,columna,depth-1));
+      }
     }
     return valor;
   }

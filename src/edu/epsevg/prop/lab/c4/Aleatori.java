@@ -21,6 +21,8 @@ public class Aleatori
     while (!t.movpossible(col)) {
       col = (int)(t.getMida() * Math.random());
     }
+    System.out.println("Aleatori tira a la columna: " + col);
+    
     return col;
   }
   

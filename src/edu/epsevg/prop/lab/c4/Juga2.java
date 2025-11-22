@@ -95,10 +95,10 @@ public class Juga2 extends javax.swing.JFrame {
         //</editor-fold>
 
         // Definiu al vostre gust els jugadors a enfrontar.
-        Jugador p2 = new Manual();
+        Jugador p2 = new Aleatori();
         //Jugador p1 = new Aleatori();
 
-        Jugador p1 = new Propossat(4,false);
+        Jugador p1 = new Propossat(2,false);
         //Jugador p2 = new Manual();
 
         boolean autoMode = true;
@@ -313,6 +313,7 @@ public class Juga2 extends javax.swing.JFrame {
         if (t.solucio(colu, color) || !t.espotmoure()) {
 
             if (t.solucio(colu, color)) {
+                
                 if (currentPlayer == player1) {
                     text1 = "WINNER";
                     text3 = "LOSER";
@@ -332,6 +333,10 @@ public class Juga2 extends javax.swing.JFrame {
                 dTitle = "TAULES";
             }
 
+            //ToDelete
+                System.out.println("****************" + dTitle + "****************");
+                System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            
             jTextField1.setText(text1);
             jTextField2.setText(text2);
             jTextField3.setText(text3);
@@ -346,6 +351,7 @@ public class Juga2 extends javax.swing.JFrame {
                 System.exit(0);
             }
         } else {
+            t.pintaTaulerALaConsola(); // ToDelete
             canviTorn();
         }
         mostraTornActual();

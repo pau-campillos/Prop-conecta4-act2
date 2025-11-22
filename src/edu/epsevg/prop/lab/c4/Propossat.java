@@ -4,7 +4,7 @@ package edu.epsevg.prop.lab.c4;
  * Jugador Proposat per Pau i Pablo
  * @author Pau i Pablo
  */
-public class Propossat
+public class Propossat extends Heuristica
   implements Jugador, IAuto
 {
   private final String nom;
@@ -109,7 +109,7 @@ public class Propossat
     int h = 0;
     if(usaHeur){
       // Acabar
-      // h = Heuristica.evaluarEstat(t, color, iniJugador); 
+      h = evaluarEstat(t, color, iniJugador); 
     }
     return h;
   }

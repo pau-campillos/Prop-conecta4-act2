@@ -15,6 +15,10 @@ class Heuristica {
     private final int POTENCIAL_DE_UN = 10;     
     private final int[] COLUMNES_CENTRALS = {1, 2, 3, 4, 4, 3, 2, 1};
     
+    public void Hueristica(){
+    
+    }
+    
     public int evaluarEstat(Tauler t, int color, int jugInicial) {
        int h = 0;
         

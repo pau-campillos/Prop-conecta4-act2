@@ -96,7 +96,7 @@ public class Juga2 extends javax.swing.JFrame {
 
         // Definiu al vostre gust els jugadors a enfrontar.
         //Jugador p2 = new Profe(2, false);
-        Jugador p1 = new Jugador1(8);
+        Jugador p1 = new Profe(8, true);
 
         Jugador p2 = new Propossat(8,true);
         //Jugador p2 = new Manual();

@@ -9,27 +9,20 @@ package edu.epsevg.prop.lab.c4;
  * @author Pau Campillos, Pablo Martín
  */
 class Heuristica {
-    private final int PARTIDA_GUANYADA = Integer.MAX_VALUE;
-    private final int POTENCIAL_DE_TRES = 1000; 
-    private final int POTENCIAL_DE_DOS = 100;   
-    private final int POTENCIAL_DE_UN = 10;     
-    private final int[] COLUMNES_CENTRALS = {1, 2, 3, 4, 4, 3, 2, 1};
+    private final int PARTIDA_GUANYADA = 100000000;
+    private final int POTENCIAL_DE_TRES = 5000;   
+    private final int POTENCIAL_DE_DOS = 200;   
+    private final int POTENCIAL_DE_UN = 10;    
     
     public int evaluarEstat(Tauler t, int color, int jugInicial) {
        int h = 0;
         
        // Evaluem el tauler actual
-       
        h += evaluarLiniesHorizontals(t, jugInicial);
        h += evaluarLiniesVerticals(t, jugInicial);
        h += evaluarDiagonalsDescendents(t, jugInicial);
        h += evaluarDiagonalsAscendents(t, jugInicial);
-       /*
-       h += evaluarControlCentre(t, jugInicial);
-       h += evaluarDoblesAmenaces(t, jugInicial);
-       */
-       //Mirar si no hi ha cap diagonal que no capiga en una columna
-        
+
        return h;
     }
 
@@ -41,13 +34,15 @@ class Heuristica {
         for (int fila = 0; fila < mida; ++fila) {
             for (int columna = 0; columna <= mida - 4; ++columna) {
                 int buits = 0, jugMax = 0, rival = 0;
+                int teSentit = 1;
                 for (int i = 0; i < 4; ++i) {
                     int valor = t.getColor(fila, columna + i);
+                    if (fila < mida - 1 && t.getColor(fila + 1, columna + i) == 0) teSentit++;
                     if (valor == jugInicial) jugMax++;
                     else if (valor == 0) buits++;
                     else rival++;
                 }
-                h += calcularHeuristica(buits, jugMax, rival);
+                h += calcularHeuristica(buits, jugMax, rival)/teSentit;
             }
         }
         return h;
@@ -67,7 +62,7 @@ class Heuristica {
                     else if (valor == 0) buits++;
                     else rival++;
                 }
-                h += calcularHeuristica(buits, jugMax, rival);
+                h += calcularHeuristica(buits, jugMax, rival)*0.85;
             }
         }
         
@@ -81,38 +76,41 @@ class Heuristica {
         for (int fila = 0; fila < mida - 3; fila++) {
             for (int col = 0; col < mida - 3; col++) {
                 int buits = 0, jugMax = 0, rival = 0;
-                
+                int teSentit = 1;
                 for (int i = 0; i < 4; i++) {
-                    int valor = t.getColor(fila - i, col + i); 
+                    int valor = t.getColor(fila + i, col + i); 
+                    if (fila + i < mida - 1 && t.getColor(fila + i + 1, col + i) == 0) teSentit++;
                     if (valor == jugInicial) jugMax++;
                     else if (valor == 0) buits++;
                     else rival++;
                 }
-                h += calcularHeuristica(buits, jugMax, rival);
+                h += (calcularHeuristica(buits, jugMax, rival)/teSentit)*1.1;
             }
         }
         return h;
     }
 
     private int evaluarDiagonalsAscendents(Tauler t, int jugInicial) {
-        int h = 0;
-        int mida = t.getMida();
-        
-        for (int fila = 3; fila < mida; fila++) {
-            for (int col = 0; col < mida - 3; col++) {
-                int buits = 0, jugMax = 0, rival = 0;
-                
-                for (int i = 0; i < 4; i++) {
-                    int valor = t.getColor(fila + i, col + i); 
-                    if (valor == jugInicial) jugMax++;
-                    else if (valor == 0) buits++;
-                    else rival++;
-                }
-                h += calcularHeuristica(buits, jugMax, rival);
+    int h = 0;
+    int mida = t.getMida();
+
+    for (int fila = 3; fila < mida; fila++) {
+        for (int col = 0; col < mida - 3; col++) {
+            int buits = 0, jugMax = 0, rival = 0;
+            int teSentit = 1;
+            for (int i = 0; i < 4; i++) {
+                int valor = t.getColor(fila - i, col + i); 
+                if (fila - i < mida - 1 && t.getColor(fila - i + 1, col + i) == 0) teSentit++;
+                if (valor == jugInicial) jugMax++;
+                else if (valor == 0) buits++;
+                else rival++;
             }
+            h += (calcularHeuristica(buits, jugMax, rival)/teSentit)*1.1;
         }
-        return h;
     }
+    return h;
+}
+
 
     private int calcularHeuristica(int buits, int jugMax, int rival){
         int h = 0;
@@ -122,13 +120,6 @@ class Heuristica {
         else if(jugMax == 3 && buits == 1) h += POTENCIAL_DE_TRES;
         else if(jugMax == 2 && buits == 2) h += POTENCIAL_DE_DOS; 
         else if(jugMax == 1 && buits == 3) h += POTENCIAL_DE_UN;
-        
-        // ChatGPT --> Parlar amb el Pau
-
-        // Cassos de bloqueig
-
-        //else if(rival == 3 && buits == 1) h += 50; // ¡BLOQUEO URGENTE!
-        //else if(rival == 2 && buits == 2) h += 5; // bloqueo preventivo
         
         // Cassos desfavorables (rival)
         else if(rival == 4) h -= PARTIDA_GUANYADA; 

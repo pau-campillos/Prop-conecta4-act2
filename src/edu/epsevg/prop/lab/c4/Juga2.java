@@ -95,10 +95,10 @@ public class Juga2 extends javax.swing.JFrame {
         //</editor-fold>
 
         // Definiu al vostre gust els jugadors a enfrontar.
-        Jugador p2 = new Aleatori();
-        //Jugador p1 = new Aleatori();
+        //Jugador p2 = new Profe(2, false);
+        Jugador p1 = new Jugador1(8);
 
-        Jugador p1 = new Propossat(2,false);
+        Jugador p2 = new Propossat(8,true);
         //Jugador p2 = new Manual();
 
         boolean autoMode = true;
@@ -334,8 +334,8 @@ public class Juga2 extends javax.swing.JFrame {
             }
 
             //ToDelete
-                System.out.println("****************" + dTitle + "****************");
-                System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("****************" + dTitle + "****************");
+            System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
             
             jTextField1.setText(text1);
             jTextField2.setText(text2);

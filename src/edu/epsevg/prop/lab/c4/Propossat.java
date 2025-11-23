@@ -4,7 +4,7 @@ package edu.epsevg.prop.lab.c4;
  * Jugador Proposat per Pau i Pablo
  * @author Pau i Pablo
  */
-public class Propossat
+public class Propossat extends Heuristica
   implements Jugador, IAuto
 {
   private final String nom;
@@ -27,7 +27,7 @@ public class Propossat
   }
 
   // s = successor
-  public int triaMillorMoviment(Tauler t, int color, int depth)
+  private int triaMillorMoviment(Tauler t, int color, int depth)
   {
     int millorMoviment = -1;
     int valor = Integer.MIN_VALUE;
@@ -62,7 +62,8 @@ public class Propossat
   private int Min_Valor(Tauler t, int color, int col, int depth, int iniJugador, int alpha, int beta){
     // Mirar
     if (t.solucio(col, -color)) return Integer.MAX_VALUE; 
-    else if (!t.espotmoure() || depth == 0) return valorarEstat(t, color, iniJugador);
+    else if (!t.espotmoure()) return 0;
+    else if (depth == 0) return valorarEstat(t, color, iniJugador);
     
     int valor = Integer.MAX_VALUE;
     
@@ -86,7 +87,8 @@ public class Propossat
   private int Max_Valor(Tauler t, int color, int col, int depth, int iniJugador, int alpha, int beta){
     // Mirar
     if (t.solucio(col, -color)) return Integer.MIN_VALUE; 
-    else if (!t.espotmoure() || depth == 0) return valorarEstat(t, color, iniJugador);
+    else if (!t.espotmoure()) return 0;
+    else if (depth == 0) return valorarEstat(t, color, iniJugador);
     
     int valor = Integer.MIN_VALUE;
     for (int columna = 0; columna < t.getMida(); columna++) {
@@ -107,10 +109,7 @@ public class Propossat
   
   private int valorarEstat(Tauler t, int color, int iniJugador){
     int h = 0;
-    if(usaHeur){
-      // Acabar
-      // h = Heuristica.evaluarEstat(t, color, iniJugador); 
-    }
+    if(usaHeur) h = evaluarEstat(t, color, iniJugador); 
     return h;
   }
   

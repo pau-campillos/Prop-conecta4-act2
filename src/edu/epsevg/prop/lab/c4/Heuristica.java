@@ -4,46 +4,65 @@ package edu.epsevg.prop.lab.c4;
 /**
  * Classe encarregada d'avaluar la heurística d'un tauler de Connecta 4.
  * <p>
+ * La heurística analitza totes les possibles "finestres" de 4 fitxes en
+ * horitzontal, vertical i les dues diagonals, assignant puntuacions segons
+ * el nombre de fitxes del jugador que maximitza (jugador principal), el que minimitza (rival) i caselles buides.
+ * </p>
+ * * <p>
+ * Constants com {@link #PARTIDA_GUANYADA}, {@link #POTENCIAL_DE_TRES}, etc. defineixen la
+ * importància (el pes) relativa de cada situació en una finestra de 4. Aquesta avaluació proporciona 
+ * una estimació de la bondat d'un estat del tauler quan no s'arriba a un estat terminal.
+ * </p>
+ * @author Pau Campillos
+ * @author Pablo Martín
+ */ 
+
+/**
+ * Classe encarregada d'avaluar la heurística d'un tauler de Connecta 4.
+ * <p>
  * La heurística analitza totes les possibles finestres de 4 fitxes en
  * horitzontal, vertical i les dues diagonals, assignant puntuacions segons
- * el nombre de fitxes del jugador que maximitza, el que minimitza i caselles buides.
+ * el nombre de fitxes del jugador que maximitza (jugador principal), el que minimitza (rival) 
+ * i caselles buides.
  * </p>
  * 
  * <p>
- * Constants com PARTIDA_GUANYADA, POTENCIAL_DE_TRES, etc. defineixen la
- * importància (el pes) relativa de cada situació en una finestra de 4.
+ * Constants com {@link #PARTIDA_GUANYADA}, {@link #POTENCIAL_DE_TRES}, etc. defineixen la
+ * importància (el pes) relativa de cada situació en una finestra de 4. Aquesta avaluació proporciona 
+ * una estimació d'un estat del tauler quan no s'arriba a un estat terminal.
  * </p>
  * 
  * @author Pau Campillos
  * @author Pablo Martín
  */
-class Heuristica {
+public class Heuristica {
     /**
      * Valor heurístic assignat quan es detecta una alineació completa de 4. En cas de que sigui del que minimitza,
-     * és el mateix valor però en negatiu
+     * és el mateix valor però en negatiu.
      */
     private final int PARTIDA_GUANYADA = 100000000;
 
     /**
      * Valor assignat a una finestra amb 3 fitxes del jugador que maximitza i 1 buit. En cas de que sigui del que minimitza,
-     * és el mateix valor però en negatiu
+     * és el mateix valor però en negatiu.
      */
     private final int POTENCIAL_DE_TRES = 1000;
 
     /**
      * Valor assignat a una finestra amb 2 fitxes del jugador que maximitza i 2 buits. En cas de que sigui del que minimitza,
-     * és el mateix valor però en negatiu
+     * és el mateix valor però en negatiu.
      */
     private final int POTENCIAL_DE_DOS = 100;
 
     /**
      * Valor assignat a una finestra amb 1 fitxa del jugador que maximitza i 3 buits. En cas de que sigui del que minimitza,
-     * és el mateix valor però en negatiu
+     * és el mateix valor però en negatiu.
      */
     private final int POTENCIAL_DE_UN = 10;  
-    
+
     /**
-     * Avalua l'estat actual del tauler per al jugador indicat.
+     * Mètode principal d'avaluació heurística.
+     * Avalua l'estat actual del tauler per al jugador indicat mitjançant el mètode privat {@link #evaluarTauler evaluarTauler}.
      *
      * @param t           Tauler actual de la partida.
      * @param jugInicial  Color del jugador maximitzador (jugador principal de l'heurística).
@@ -56,13 +75,16 @@ class Heuristica {
     }
 
     /**
-     * Avalua el tauler recorrent totes les finestres de mida 4 en les
+     * Avalua el tauler complet recorrent totes les finestres de mida 4 en les
      * quatre direccions possibles (horitzontal, vertical i diagonals).
+     * * Recorre el tauler des de les coordenades inicials fins a les coordenades finals 
+     * de cada direcció per assegurar-se que totes les finestres de 4 són avaluades 
+     * sense sortir dels límits del tauler.
      *
      * @param t           Tauler a analitzar.
-     * @param jugInicial  Jugador que es vol maximitzar.
-     * @return            Valor heurístic total del tauler.
-     */
+     * @param jugInicial  Jugador que es vol maximitzar (color de la fitxa).
+     * @return            Valor heurístic total del tauler, que és la suma dels valors de totes les finestres.
+     */ 
     private int evaluarTauler(Tauler t, int jugInicial) {
         int h = 0;
         int mida = t.getMida();
@@ -111,14 +133,17 @@ class Heuristica {
     }
 
     /**
-     * Calcula el valor heurístic d'una finestra de 4 posicions en funció
+     * Calcula el valor heurístic d'una única finestra de 4 posicions en funció
      * del nombre de fitxes pròpies, rivals i caselles buides.
+     * * Aquest mètode aplica els pesos definits a les constants de la classe
+     * per quantificar cada finestra.
      *
      * @param buits   Nombre de caselles buides.
      * @param jugMax  Nombre de fitxes del jugador maximitzador.
      * @param rival   Nombre de fitxes del jugador rival.
-     * @return        Valor heurístic assignat a aquesta finestra.
-     */
+     * @return        Valor heurístic assignat a aquesta finestra 
+     * (positiu si és favorable per a MAX, negatiu si és favorable per a MIN, 0 altrament).
+     */ 
     private int calcularHeuristica(int buits, int jugMax, int rival){
         int h = 0;
         

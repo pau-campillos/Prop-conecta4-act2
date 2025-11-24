@@ -5,17 +5,19 @@ import edu.epsevg.prop.lab.c4.Jugador;
 import edu.epsevg.prop.lab.c4.Tauler;
 
 /**
- * Implementació del jugador "Propossat", basat en Minimax amb poda Alpha-Beta.
+ * Implementació del jugador "Propossat", basat en l'algorisme de cerca 
+ * Minimax amb poda Alpha-Beta.
  * <p>
  * Aquest jugador pot utilitzar o no heurística i poda Alpha-Beta en funció
- * dels paràmetres rebuts al constructor. Extén {@link Heuristica} i implementa
+ * dels paràmetres rebuts al constructor, oferint més opcions en l'estratègia 
+ * de joc. Extén {@link Heuristica} i implementa
  * les interfícies {@link Jugador} i {@link IAuto}.
  * </p>
  *
  * <p>
- * El jugador explora l'arbre de joc fins a una profunditat determinada i
- * selecciona la millor columna possible segons les funcions Max_Valor i
- * Min_Valor, aplicant la poda Alpha-Beta si està habilitada.
+ * L'algorisme explora l'arbre de joc fins a la {@link #depth profunditat màxima} 
+ * i selecciona la millor columna possible segons les funcions {@link #Max_Valor Max_Valor} 
+ * i {@link #Min_Valor Min_Valor}, aplicant la poda Alpha-Beta si {@link #usaPoda està habilitada}.
  * </p>
  *
  * @author Pau Campillos
@@ -45,6 +47,7 @@ public class Propossat extends Heuristica
 
     /**
      * Constructora del jugador Propossat.
+     * Inicialitza els paràmetres de cerca Minimax i d'optimització.
      *
      * @param profMaxima  Profunditat màxima de la cerca Minimax.
      * @param usaremHeur  Si s'utilitzarà heurística en la valoració d'estats terminals.
@@ -62,6 +65,10 @@ public class Propossat extends Heuristica
 
     /**
      * Assigna el moviment del jugador segons l'algorisme Minimax.
+     * Aquest mètode inicialitza el comptador de jugades finals del torn
+     * i crida a la funció {@link #triaMillorMoviment triaMillorMoviment} per 
+     * determinar la millor columna. 
+     * * També mostra per consola les estadístiques de cerca del torn.
      *
      * @param t   Tauler actual.
      * @param color Color (fitxa) del jugador que mou.
@@ -77,10 +84,17 @@ public class Propossat extends Heuristica
         return res;
     }
 
-    /**
+     /**
      * Selecciona el millor moviment possible per al jugador utilitzant
-     * la funció Max_Valor (primer moviment del jugador).
-     *
+     * la funció {@link #Max_Valor Max_Valor} (primer moviment del jugador).
+     * 
+     * Si es el primer moviment de la partida (independentment del jugador), 
+     * reinicia el contador jugadesFinalsTotals, per si l'usuari fes diverses 
+     * partides seguides.
+     * 
+     * * Aquest mètode opera a nivell 0 de l'arbre i determina la columna amb la 
+     * màxima puntuació Minimax/Alpha-Beta.
+     * 
      * @param t     Tauler actual.
      * @param color   Color del jugador que mou.
      * @param depth   Profunditat restant.
@@ -93,9 +107,16 @@ public class Propossat extends Heuristica
         int alpha = Integer.MIN_VALUE;
         int beta = Integer.MAX_VALUE;
 
+        int contador = 0;
+
         for (int columna = 0; t.espotmoure() && columna < t.getMida(); columna++) {
             if (!t.movpossible(columna)) continue;
 
+            if (contador < 2 && t.getColor(0,columna) != 0){
+              if (t.getColor(1, columna) != 0) contador+=2;
+              else contador++; 
+            }
+            
             Tauler s = new Tauler(t);
             s.afegeix(columna, color);
 
@@ -106,10 +127,14 @@ public class Propossat extends Heuristica
                 valor = candidat;
                 millorMoviment = columna;
             }
-            // Actualització d'alpha a nivell 0 per tal que els següents Min_Valor puguin podar contra el millor resultat fins ara
+            
             if (usaPoda) {
                 alpha = Math.max(alpha, valor);
             }
+        }
+
+        if (contador < 2){
+          jugadesFinalsTotals = jugadesFinalsEnCadaTorn;
         }
 
         if (millorMoviment == -1) {
@@ -125,22 +150,25 @@ public class Propossat extends Heuristica
 
     /**
      * Funció Min del Minimax amb poda Alpha-Beta.
-     * Representa el torn del rival (minimitzador).
+     * Representa el torn del rival (minimitzador) buscant el moviment 
+     * que minimitza el valor màxim potencial del jugador principal.
      *
-     * @param t      Tauler actual.
-     * @param color    Color del jugador que mou en aquest nivell (rival).
-     * @param col     Última columna jugada.
-     * @param depth    Profunditat restant.
+     * @param t         Tauler actual.
+     * @param color     Color del jugador que mou en aquest nivell (rival, minimitzador).
+     * @param col       Última columna jugada (per comprovar l'estat de solució).
+     * @param depth     Profunditat restant.
      * @param iniJugador Color del jugador principal (maximitzador).
-     * @param alpha    Valor alfa de la poda (millor opció coneguda per al MAX).
-     * @param beta    Valor beta de la poda (millor opció coneguda per al MIN).
-     * @return      Valor mínim que pot retornar aquest node.
-     */
+     * @param alpha     Valor alfa de la poda (millor opció coneguda per al MAX).
+     * @param beta      Valor beta de la poda (millor opció coneguda per al MIN).
+     * @return          Valor mínim que pot retornar aquest node. Retorna {@code Integer.MAX_VALUE} si 
+     * el jugador principal guanya en el moviment anterior, {@code Integer.MIN_VALUE}
+     * si el rival guanya en el moviment actual, un valor heurístic, o 0 si és empat.
+     */ 
     private int Min_Valor(Tauler t, int color, int col, int depth, int iniJugador, int alpha, int beta){
         // Avaluació d'estats terminals: Victòria/Derrota o profunditat màxima
         if (t.solucio(col, -color)) return Integer.MAX_VALUE; // MAX va guanyar l'últim moviment (derrota del MIN actual)
         else if (!t.espotmoure()) return 0; // Tauler ple (empat)
-        else if (depth == 0) return valorarEstat(t, color, iniJugador); // Avaluació heurística
+        else if (depth == 0) return valorarEstat(t, iniJugador); // Avaluació heurística
 
         int valor = Integer.MAX_VALUE;
 
@@ -152,9 +180,8 @@ public class Propossat extends Heuristica
 
             valor = Math.min(valor, Max_Valor(s, -color, columna, depth-1, iniJugador, alpha, beta));
 
-            // Poda Alpha: Si el valor MIN és més petit o igual que alpha, la branca es poda
+            // Poda Alpha: Si el valor MIN és més petit o igual que alpha, la branca es poda.
             if(usaPoda && valor <= alpha){
-                //System.out.println("Poda alpha");
                 return valor;
             }
             beta = Math.min(beta, valor);
@@ -165,22 +192,25 @@ public class Propossat extends Heuristica
 
     /**
      * Funció Max del Minimax amb poda Alpha-Beta.
-     * Representa el torn del jugador principal (maximitzador).
+     * Representa el torn del jugador principal (maximitzador) buscant el moviment 
+     * que maximitza el valor mínim potencial del rival.
      *
-     * @param t      Tauler actual.
-     * @param color    Color del jugador que mou en aquest nivell (principal).
-     * @param col     Última columna jugada.
-     * @param depth    Profunditat restant.
+     * @param t         Tauler actual.
+     * @param color     Color del jugador que mou en aquest nivell (principal, maximitzador).
+     * @param col       Última columna jugada (per comprovar l'estat de solució).
+     * @param depth     Profunditat restant.
      * @param iniJugador Color del jugador principal.
-     * @param alpha    Valor alfa de la poda (millor opció coneguda per al MAX).
-     * @param beta    Valor beta de la poda (millor opció coneguda per al MIN).
-     * @return      Valor màxim que pot retornar aquest node.
-     */
+     * @param alpha     Valor alfa de la poda (millor opció coneguda per al MAX).
+     * @param beta      Valor beta de la poda (millor opció coneguda per al MIN).
+     * @return          Valor màxim que pot retornar aquest node. Retorna {@code Integer.MIN_VALUE} si 
+     * el rival guanya en el moviment anterior, {@code Integer.MAX_VALUE}
+     * si el jugador principal guanya en el moviment actual, un valor heurístic, o 0 si és empat.
+     */ 
     private int Max_Valor(Tauler t, int color, int col, int depth, int iniJugador, int alpha, int beta){
         // Avaluació d'estats terminals: Victòria/Derrota o profunditat màxima
         if (t.solucio(col, -color)) return Integer.MIN_VALUE; // MIN va guanyar l'últim moviment (derrota del MAX actual)
         else if (!t.espotmoure()) return 0; // Tauler ple (empat)
-        else if (depth == 0) return valorarEstat(t, color, iniJugador); // Avaluació heurística
+        else if (depth == 0) return valorarEstat(t, iniJugador); // Avaluació heurística
 
         int valor = Integer.MIN_VALUE;
         for (int columna = 0; columna < t.getMida(); columna++) {
@@ -191,27 +221,25 @@ public class Propossat extends Heuristica
 
             valor = Math.max(valor, Min_Valor(s, -color, columna, depth-1, iniJugador, alpha, beta));
 
-            // Poda Beta: Si el valor MAX és més gran o igual que beta, la branca es poda
+            // Poda Beta: Si el valor MAX és més gran o igual que beta, la branca es poda.
             if(usaPoda && beta <= valor){
-                //System.out.println("Poda beta");
                 return valor;
             }
             alpha = Math.max(alpha, valor);
         }
         return valor;
     }
-
+    
     /**
      * Avalua un estat quan s'arriba a profunditat 0.
      * Si usaHeur és false, retorna 0. A més, incrementa en 1 el número de
      * jugades finals (# vegades calculada la heurística).
      *
      * @param t      Tauler actual.
-     * @param color    Color del jugador que avalua.
      * @param iniJugador Color del jugador principal.
      * @return      Valor heurístic o 0 si no s'utilitza heurística.
      */
-    private int valorarEstat(Tauler t, int color, int iniJugador){
+    private int valorarEstat(Tauler t, int iniJugador){
         int h = 0;
         jugadesFinalsTotals++;
         jugadesFinalsEnCadaTorn++;

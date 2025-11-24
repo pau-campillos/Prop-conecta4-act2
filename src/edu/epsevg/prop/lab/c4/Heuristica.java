@@ -1,29 +1,11 @@
 package edu.epsevg.prop.lab.c4;
 
-
-/**
- * Classe encarregada d'avaluar la heurística d'un tauler de Connecta 4.
- * <p>
- * La heurística analitza totes les possibles "finestres" de 4 fitxes en
- * horitzontal, vertical i les dues diagonals, assignant puntuacions segons
- * el nombre de fitxes del jugador que maximitza (jugador principal), el que minimitza (rival) i caselles buides.
- * </p>
- * * <p>
- * Constants com {@link #PARTIDA_GUANYADA}, {@link #POTENCIAL_DE_TRES}, etc. defineixen la
- * importància (el pes) relativa de cada situació en una finestra de 4. Aquesta avaluació proporciona 
- * una estimació de la bondat d'un estat del tauler quan no s'arriba a un estat terminal.
- * </p>
- * @author Pau Campillos
- * @author Pablo Martín
- */ 
-
 /**
  * Classe encarregada d'avaluar la heurística d'un tauler de Connecta 4.
  * <p>
  * La heurística analitza totes les possibles finestres de 4 fitxes en
  * horitzontal, vertical i les dues diagonals, assignant puntuacions segons
- * el nombre de fitxes del jugador que maximitza (jugador principal), el que minimitza (rival) 
- * i caselles buides.
+ * el nombre de fitxes del jugador que maximitza (jugador principal), i el que minimitza (rival)
  * </p>
  * 
  * <p>

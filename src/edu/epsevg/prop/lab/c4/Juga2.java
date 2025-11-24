@@ -33,6 +33,8 @@ public class Juga2 extends javax.swing.JFrame {
     boolean autoMode = true;
     boolean estaPensant = false;
 
+    long startTime; //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
     /**
      * Creates new form NewJFrame
      */
@@ -65,6 +67,8 @@ public class Juga2 extends javax.swing.JFrame {
         Ymax = mides.getHeight();
         Xmax = mides.getWidth();
         Step = (int) Xmax / 8;
+
+        startTime = System.currentTimeMillis(); // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
 
     /**
@@ -98,7 +102,7 @@ public class Juga2 extends javax.swing.JFrame {
         //Jugador p2 = new Profe(2, false);
         Jugador p2 = new Profe(8, true);
 
-        Jugador p1 = new Propossat(8,true);
+        Jugador p1 = new Propossat(8,true, false);
         //Jugador p2 = new Manual();
 
         boolean autoMode = true;
@@ -311,6 +315,15 @@ public class Juga2 extends javax.swing.JFrame {
         String text1 = "", text2 = "", text3 = "", dTitle = "";
 
         if (t.solucio(colu, color) || !t.espotmoure()) {
+            
+            // **CÀLCUL DE LA DURADA**
+            long endTime = System.currentTimeMillis(); //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            double durationSeconds = (endTime - startTime) / 1000.0;  // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            
+            // Format per a 2 decimals
+            String durationFormatted = String.format("%.2f", durationSeconds); //AAAAAAAAAAAAAAAAAAAAAA
+
+            System.out.println("Durada de la partida: " + durationFormatted);
 
             if (t.solucio(colu, color)) {
                 
@@ -333,10 +346,6 @@ public class Juga2 extends javax.swing.JFrame {
                 dTitle = "TAULES";
             }
 
-            //ToDelete
-            System.out.println("****************" + dTitle + "****************");
-            System.out.println("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-            
             jTextField1.setText(text1);
             jTextField2.setText(text2);
             jTextField3.setText(text3);
@@ -351,7 +360,6 @@ public class Juga2 extends javax.swing.JFrame {
                 System.exit(0);
             }
         } else {
-            t.pintaTaulerALaConsola(); // ToDelete
             canviTorn();
         }
         mostraTornActual();
